@@ -1,6 +1,6 @@
 # Next JS crash course
 
-## Routing : creation de routes
+## Routing : creation de routes
 
 Le systeme de routing de Next.js est basé sur le système de fichier. Le repertoire app est le point d'entrée de l'application. Les fichiers dans ce repertoire sont accessibles via l'url racine de l'application.
 
@@ -105,3 +105,110 @@ Le hook usePathname permet de recuperer le pathname de la page courante. Il perm
 ### Le hook useRouter
 
 Ce hook permet de changer par le code la route courante de l'application. Il permet aussi de recuperer les parametres de la route courante.
+
+## Data Fetching
+
+Toute application doit pouvoir récuperer des données depuis une source externe. Next.js fournit plusieurs méthodes pour récuperer des données:
+
+- sur le serveur avec `fetch`
+- sur le serveur avec des librairies tierces
+- depuis le client avec des `route handlers`
+- depuis le client avec libraiaries tierces
+
+### Fetch
+
+Next.js fournit une fonction `fetch` qui permet de récupérer des données depuis une source externe, tout en offrant des fonctionnalités de cache et de revalidation. Nous pouvons directement utiliser `fetch` avec `async/await` au sein des composants serveurs, des route handlers, dans les `server actions`.
+
+Par exemple:
+
+```ts
+async function getData() {
+  const res = await fetch("https://api.example.com/data");
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+
+  return res.json();
+}
+
+export default async function Page() {
+  const data = await getData();
+  return <h1>{data}</h1>;
+}
+```
+
+Pour plus d'informations sur `fetch` voir la documentation officielle de Next.js : https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating
+
+## Styling
+
+La projet Next qui nous sert de point de départ cette semaine vient configurée avec TailwindCSS.
+
+L'usage de tailwind se fait via des classes css directement dans le code JSX. TailwindCSS est une librairie de classes CSS qui permet de styliser rapidement et facilement une application:
+
+```tsx
+export default function Page() {
+  return <h1 className="text-3xl font-bold underline">Bonjour, les B3</h1>;
+}
+```
+
+## Les composants Serveurs et les composants clients
+
+Next.js fournit deux types de composants: les composants serveurs et les composants clients.
+
+### Les composants serveurs
+
+Ces composants permettent d'écrire du code qui génère l'UI côté serveur et qui propose un systeme de cache optionnel.
+Cette fonctionnalité s'associe avec le système de routing afin de proposer des fonctionnalités de `streaming` et de `rendu partiel`. Il existe ainsi trois stratégies de rendu:
+
+- Static rendering
+- Dynamic rendering
+- Streaming
+
+Par defaut les composants Next sont des composants serveurs.
+
+#### Les avantages du rendu serveur
+
+- Data fetching: Les composants serveurs permettent de récupérer des données depuis une source externe et ce directement depuis le serveurs sans passer par le client (contrairement à une application React classique). Cela permet de réduire le temps de chargement de la page lorsqu'il est conditionné par des données externes.
+
+- Securité: Les composants serveurs permettent de cacher des données sensibles côté serveur.
+
+- Mise en cache: Les résultats de rendu serveur peuvent être cachés et réutilisés pour les requêtes suivantes et pour des clients différents.
+
+- Reduction de la taille du bundle: Les composants serveurs permettent de ne pas inclure des librairies tierces dans le bundle client. C'est un avantage pour les utilisateurs dont l'accès à internet est limité ou dont les machines sont peu puissantes.
+
+- SEO
+
+- Initial load performance
+
+Pour plus de précisions : https://nextjs.org/docs/app/building-your-application/rendering/server-components
+
+### Les composants clients
+
+Les composants clients permettent d'écrire du code qui génère l'UI côté client. Ils sont utilisés pour les interactions utilisateur, les animations, les transitions, etc.
+
+#### Les avantages du rendu client
+
+- Interactivité: Les composants clients permettent de rendre l'application interactive.
+- APIs du navigateur: Les composents clients permettent d'utiliser les APIs du navigateur : geolocalisation, local storage, etc.
+
+#### Utilisation des composants clients
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+  );
+}
+```
+
+Pour aller plus loin : https://nextjs.org/docs/app/building-your-application/rendering/client-components
